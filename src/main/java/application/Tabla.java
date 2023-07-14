@@ -16,7 +16,7 @@ public class Tabla extends GridPane {
     private int velicinaPolja;
     private List<Polje> odigraniPotezi = new ArrayList<>();
 
-    private int flag = 0; // =0 je beli na potezu
+    private int flag = 0; // flag = 0 - beli je na potezu
 
     //private Polje selektovanoPolje = null;
 
@@ -60,20 +60,32 @@ public class Tabla extends GridPane {
             ((Polje)node).vratiBoju();
     }
 
-    private void kliknutaFigura(Figura f) // logika za jedenje
+    private void kliknutaFigura(Figura f)
     {
+        //logika za jedenje - drugi klik
         if(oznacenaFig != null) {
             Polje kliknutoPolje = getPoljeIspodFigure(f);
+
+            if((flag == 0 && oznacenaFig.boja != Boja.BELA) || (flag == 1 && oznacenaFig.boja != Boja.CRNA)){
+                System.out.println("invalid play queue");
+                return;
+            }
+
             if(oznacenaFig.getMogucaPoljaZaJedenje().contains(kliknutoPolje.getPozicija())
                     && (oznacenaFig.boja != f.boja)) { // sacuvaj pojedenu figuru u listu, po zelji
+                if(flag == 2) {
+                    oznacenaFig = f;
+                    obojMogucaPolja(f);
+                    return;
+                }
                 kliknutoPolje.obrisiFiguru();
                 pomeriOznacenuFig(kliknutoPolje);
-                oznacenaFig = null;
                 return;
 
             }
         }
 
+        //selektuj figuru - prvi klik
         oznacenaFig = f;
         obojMogucaPolja(f);
 
@@ -84,18 +96,20 @@ public class Tabla extends GridPane {
         if(odigraniPotezi.isEmpty())
             return;
 
+
+        System.out.println(oznacenaFig);
+        System.out.println();
+
         if(odigraniPotezi.get(odigraniPotezi.size()-1).getFigura().boja == Boja.CRNA
                 && oznacenaFig.boja == Boja.BELA) {
-            //ako se na poslednjem polju iz liste nalazi bela fig,
-            //tada samo crna moze da bude selektovana
             flag = 0;
-            System.out.println("Usao je ovde");
+            System.out.println("crni je na potezu");
         }else if(odigraniPotezi.get(odigraniPotezi.size()-1).getFigura().boja == Boja.BELA
                 && oznacenaFig.boja == Boja.CRNA){
-            System.out.println("Usao je ovde2");
+            System.out.println("beli je na potezu");
             flag = 1;
-            //oznacenaFig = null;
-        } else {
+
+        } else {  /// ovo je slucaj prvog klika, selekta figure
             flag = 2;
         }
     }
@@ -103,15 +117,16 @@ public class Tabla extends GridPane {
     private void poljeKliknuto(Polje polje) { //pomeranje figure
 
         osveziBojuPolja();
-        redosledIgranja();
 
         if(polje.imaFiguru()) {
+            redosledIgranja();
             kliknutaFigura(polje.getFigura());
         }
         else {
             if(oznacenaFig == null)
                 return;
 
+            redosledIgranja();
             if(oznacenaFig.poljeJeMoguce(polje.getPozicija())) { //dodajemo figuru na polje, pomeramo je
                 pomeriOznacenuFig(polje);
             }
@@ -152,19 +167,12 @@ public class Tabla extends GridPane {
             System.out.println("invalid play queue");
             return;
         }
-        /*
-        getPoljeIspodFigure(oznacenaFig).obrisiFiguru();
-        polje.dodajFiguru(oznacenaFig);
-        odigraniPotezi.add(polje);
-
-         */
 
 
         ///LOGIKA ZA ROKADU - ne radi
         if(oznacenaFig instanceof Kralj) {
             if(oznacenaFig.boja == Boja.BELA && oznacenaFig.pozicija.x == 4
                     && oznacenaFig.pozicija.y == 7) {
-                    System.out.println("ovde 2");
                     System.out.println(polje.getPozicija().x);
                     System.out.println(polje.getPozicija().y);
                     if(polje == getPoljeAt(7, 6)) {
@@ -272,21 +280,7 @@ public class Tabla extends GridPane {
 
 // kad se klikne na odredjenu figuru, poziva se metoda obojMogucaPolja za trenutnaFig
 
-	/*
-	private void pomeriFig() {
 
-		for(int i = 0; i < 8; i++) {
-			for(int j = 0; j < 8; j++) {
-				Polje dest = getPoljeAt(j, i);
-				Polje izvor = getPoljeAt(oznacenaFig.pozicija.x, oznacenaFig.pozicija.y);
-				if(usloviZaPomeranjeFig(izvor, dest) && poljeKliknuto(dest)){
-					dest.dodajFiguru(oznacenaFig);
-					izvor.obrisiFiguru();
-				}
-			}
-		}
-	}
-	*/
 	/*
 	private boolean poljeJeSelektovano(Polje polje) {  // vraca true ako je polje na kojem je figura kliknuto
 		if(poljeKliknuto(polje) == true) {
