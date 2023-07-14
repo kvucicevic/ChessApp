@@ -7,12 +7,11 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
-import java.util.Objects;
 
 public class Start extends Application {
 
     @Override
-    public void start(Stage stage) throws Exception {
+    public void start(Stage stage){
         Stage stage1 = new Stage();
 
         GridPane root = new GridPane();

@@ -1,12 +1,9 @@
 package figure;
 
 import application.Point;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
-import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -16,10 +13,9 @@ public abstract class Figura extends ImageView {
     {
         BELA,
         CRNA,
-        SIVA,
+
     }
 
-    protected Image slika;
     public Point pozicija;
     public Boja boja;
 
@@ -39,7 +35,7 @@ public abstract class Figura extends ImageView {
             bojastr = "crni";
 
         String str = "/" + bojastr + imgName + ".jpg";
-        System.out.println(str);
+
         return new Image(Objects.requireNonNull(Figura.class.getResourceAsStream(str)), 70, 70, true, true);
         // /crniTop.jpg
     }

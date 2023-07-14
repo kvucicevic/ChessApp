@@ -16,6 +16,8 @@ public class Tabla extends GridPane {
     private int velicinaPolja;
     private List<Polje> odigraniPotezi = new ArrayList<>();
 
+    private int flag = 0; // =0 je beli na potezu
+
     //private Polje selektovanoPolje = null;
 
     public Tabla (int velicinaTable)
@@ -79,21 +81,29 @@ public class Tabla extends GridPane {
 
     public void redosledIgranja() {
 
+        if(odigraniPotezi.isEmpty())
+            return;
+
         if(odigraniPotezi.get(odigraniPotezi.size()-1).getFigura().boja == Boja.CRNA
                 && oznacenaFig.boja == Boja.BELA) {
             //ako se na poslednjem polju iz liste nalazi bela fig,
             //tada samo crna moze da bude selektovana
+            flag = 0;
             System.out.println("Usao je ovde");
-        }else {
+        }else if(odigraniPotezi.get(odigraniPotezi.size()-1).getFigura().boja == Boja.BELA
+                && oznacenaFig.boja == Boja.CRNA){
             System.out.println("Usao je ovde2");
-            oznacenaFig = null;
-            return;
+            flag = 1;
+            //oznacenaFig = null;
+        } else {
+            flag = 2;
         }
     }
 
     private void poljeKliknuto(Polje polje) { //pomeranje figure
 
         osveziBojuPolja();
+        redosledIgranja();
 
         if(polje.imaFiguru()) {
             kliknutaFigura(polje.getFigura());
@@ -138,41 +148,58 @@ public class Tabla extends GridPane {
 
     private void pomeriOznacenuFig(Polje polje) {
 
+        if((flag == 0 && oznacenaFig.boja != Boja.BELA) || (flag == 1 && oznacenaFig.boja != Boja.CRNA) || flag == 2){
+            System.out.println("invalid play queue");
+            return;
+        }
+        /*
         getPoljeIspodFigure(oznacenaFig).obrisiFiguru();
         polje.dodajFiguru(oznacenaFig);
         odigraniPotezi.add(polje);
 
+         */
+
 
         ///LOGIKA ZA ROKADU - ne radi
         if(oznacenaFig instanceof Kralj) {
-            if(oznacenaFig.boja == Boja.BELA) {
-                System.out.println("ovde sam");
-                if(oznacenaFig.pozicija.x == 7
-                        && oznacenaFig.pozicija.y == 4) {
-                    System.out.println("ovde sam");
-                    if(polje == getPoljeAt(2, 7)) {
-                        staviFig(getPoljeAt(3,7), getPoljeAt(7,0).getFigura());
+            if(oznacenaFig.boja == Boja.BELA && oznacenaFig.pozicija.x == 4
+                    && oznacenaFig.pozicija.y == 7) {
+                    System.out.println("ovde 2");
+                    System.out.println(polje.getPozicija().x);
+                    System.out.println(polje.getPozicija().y);
+                    if(polje == getPoljeAt(7, 6)) {
+                        Figura top = getPoljeAt(7,7).getFigura();
+                        pomeriFig(top, getPoljeAt(7, 5));
+                    } else if (polje == getPoljeAt(7, 2)){
+                        Figura top = getPoljeAt(7,0).getFigura();
+                        pomeriFig(top, getPoljeAt(7, 3));
                     }
-                }
 
-            }else {
+            } else {
                 if(oznacenaFig.pozicija.x == 4
                         && oznacenaFig.pozicija.y == 0) {
-                    if(polje == getPoljeAt(0, 2)) {
-                        staviFig(getPoljeAt(0,3), getPoljeAt(0,0).getFigura());
+                    if(polje == getPoljeAt(0, 6)) {
+                        Figura top = getPoljeAt(0,7).getFigura();
+                        pomeriFig(top, getPoljeAt(0, 5));
+                    } else if (polje == getPoljeAt(0, 2)){
+                        Figura top = getPoljeAt(0,0).getFigura();
+                        pomeriFig(top, getPoljeAt(0, 3));
                     }
                 }
             }
 
         }
 
+        pomeriFig(oznacenaFig, polje);
+        //getPoljeIspodFigure(oznacenaFig).obrisiFiguru();
+        //polje.dodajFiguru(oznacenaFig);
+        odigraniPotezi.add(polje);
+
     }
 
-    private void staviFig(Polje polje, Figura f) {
-
+    private void pomeriFig(Figura f, Polje p){
         getPoljeIspodFigure(f).obrisiFiguru();
-        polje.dodajFiguru(f);
-
+        p.dodajFiguru(f);
     }
 
     private Polje getPoljeIspodFigure(Figura f) {
@@ -188,7 +215,7 @@ public class Tabla extends GridPane {
 
         for (Point p : f.getMoguciPotezi()) {
             Polje polje = getPoljeAt(p.y, p.x);
-            if(polje.imaFiguru() && polje.getFigura().boja != f.boja)
+            if(polje != null && polje.imaFiguru() && polje.getFigura().boja != f.boja)
                 polje.obojiPolje(Color.BLUE);
         }
     }
@@ -266,17 +293,5 @@ public class Tabla extends GridPane {
 			return true;
 		}
 		return false;
-	}
-	*/
-
-	/*
-	private boolean usloviZaPomeranjeFig(Polje izvor, Polje dest)
-	{
-	    if(poljeKliknuto(izvor) == true &&
-			(oznacenaFig.getMoguciPotezi()).contains(dest)) {
-			//&& poljeKliknuto(dest) == true
-	    		return true;
-	    }
-	    return false;
 	}
 	*/
