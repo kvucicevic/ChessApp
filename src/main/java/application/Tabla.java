@@ -96,9 +96,10 @@ public class Tabla extends GridPane {
         if(odigraniPotezi.isEmpty())
             return;
 
-
         System.out.println(oznacenaFig);
-        System.out.println();
+        if(oznacenaFig == null){
+            return;
+        }
 
         if(odigraniPotezi.get(odigraniPotezi.size()-1).getFigura().boja == Boja.CRNA
                 && oznacenaFig.boja == Boja.BELA) {
@@ -173,8 +174,6 @@ public class Tabla extends GridPane {
         if(oznacenaFig instanceof Kralj) {
             if(oznacenaFig.boja == Boja.BELA && oznacenaFig.pozicija.x == 4
                     && oznacenaFig.pozicija.y == 7) {
-                    System.out.println(polje.getPozicija().x);
-                    System.out.println(polje.getPozicija().y);
                     if(polje == getPoljeAt(7, 6)) {
                         Figura top = getPoljeAt(7,7).getFigura();
                         pomeriFig(top, getPoljeAt(7, 5));

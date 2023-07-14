@@ -34,7 +34,8 @@ public abstract class Figura extends ImageView {
         if(boja == Boja.CRNA)
             bojastr = "crni";
 
-        String str = "/" + bojastr + imgName + ".jpg";
+
+        String str = "/" + bojastr + imgName + ".png";
 
         return new Image(Objects.requireNonNull(Figura.class.getResourceAsStream(str)), 70, 70, true, true);
         // /crniTop.jpg
