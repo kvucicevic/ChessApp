@@ -6,19 +6,17 @@ import javafx.scene.Node;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
-public class Tabla extends GridPane {
+public class Tabla extends GridPane implements Publisher {
 
     public Figura oznacenaFig;
-    ///private int velicinaTable;
-    private int velicinaPolja;
+    private final int velicinaPolja;
     private List<Polje> odigraniPotezi = new ArrayList<>();
-
+    private List<Figura> pojedeneFig = new ArrayList<>();
     private int flag = 0; // flag = 0 - beli je na potezu
+    private List<Subscriber> subs = new ArrayList<>();
 
-    //private Polje selektovanoPolje = null;
 
     public Tabla (int velicinaTable)
     {
@@ -27,7 +25,8 @@ public class Tabla extends GridPane {
         velicinaPolja = velicinaTable/8;
     }
 
-    public void nacrtajTablu() {
+    public void nacrtajTablu()
+    {
         for(int i = 0; i < 8; i++)
             for(int j = 0; j < 8; j++)
                 add(new Polje(velicinaPolja, j, i), j,i);
@@ -53,7 +52,6 @@ public class Tabla extends GridPane {
         }
     }
 
-
     private void osveziBojuPolja()
     {
         for(Node node : getChildren())
@@ -78,6 +76,10 @@ public class Tabla extends GridPane {
                     obojMogucaPolja(f);
                     return;
                 }
+                Figura fig = kliknutoPolje.getFigura();
+                pojedeneFig.add(fig);
+                //System.out.println(pojedeneFig);
+                notifySubs(fig);
                 kliknutoPolje.obrisiFiguru();
                 pomeriOznacenuFig(kliknutoPolje);
                 return;
@@ -96,7 +98,6 @@ public class Tabla extends GridPane {
         if(odigraniPotezi.isEmpty())
             return;
 
-        System.out.println(oznacenaFig);
         if(oznacenaFig == null){
             return;
         }
@@ -138,21 +139,17 @@ public class Tabla extends GridPane {
         }
     }
 
+
     /*
     private ArrayList<Point> nemogucePreskakanje() {
     	ListIterator<Point> iter = oznacenaFig.getMoguciPotezi().listIterator();
-    	ArrayList<Point> updateMoguciPot = new ArrayList<>();
     	while(iter.hasNext()) {
     		Point p1 = iter.next();
     		Polje p2 = getPoljeAt(p1.y, p1.x); //polje koje se nalzai u mogucim poljima figure
     		if(p2.imaFiguru()) {
-    			if(p2.getFigura().boja == oznacenaFig.boja) {
-    				iter.remove();
-    				System.out.println("iterator: " + iter.toString());
-    				//break;
-    				iter.forEachRemaining(updateMoguciPot :: add);
-    				return updateMoguciPot;
-    			}
+    			iter.remove();
+                System.out.println("iterator: " + iter.toString());
+
 
     		}
     		//iter.forEachRemaining(updateMoguciPot :: add);         //ovde ce da brise polje za pesaka
@@ -160,7 +157,9 @@ public class Tabla extends GridPane {
     	}
     	return oznacenaFig.getMoguciPotezi();
     }
-    */
+
+     */
+
 
     private void pomeriOznacenuFig(Polje polje) {
 
@@ -170,7 +169,7 @@ public class Tabla extends GridPane {
         }
 
 
-        ///LOGIKA ZA ROKADU - ne radi
+        ///LOGIKA ZA ROKADU
         if(oznacenaFig instanceof Kralj) {
             if(oznacenaFig.boja == Boja.BELA && oznacenaFig.pozicija.x == 4
                     && oznacenaFig.pozicija.y == 7) {
@@ -222,9 +221,13 @@ public class Tabla extends GridPane {
 
         for (Point p : f.getMoguciPotezi()) {
             Polje polje = getPoljeAt(p.y, p.x);
-            if(polje != null && polje.imaFiguru() && polje.getFigura().boja != f.boja)
+            assert polje != null;
+            polje.obojiPolje(Color.SKYBLUE);
+            if(polje.imaFiguru() && polje.getFigura().boja != f.boja) {
                 polje.obojiPolje(Color.BLUE);
+            }
         }
+
     }
 
     private Polje getPoljeAt(int row, int column)
@@ -275,16 +278,20 @@ public class Tabla extends GridPane {
 
         postaviMouseCallbackZaSvaPolja();
     }
+
+    public List<Figura> getPojedeneFig() {
+        return pojedeneFig;
+    }
+
+    @Override
+    public void addSub(Subscriber sub) {
+        subs.add(sub);
+    }
+
+    @Override
+    public void notifySubs(Object notification) {
+        for(Subscriber s : subs){
+            s.update(notification);
+        }
+    }
 }
-
-// kad se klikne na odredjenu figuru, poziva se metoda obojMogucaPolja za trenutnaFig
-
-
-	/*
-	private boolean poljeJeSelektovano(Polje polje) {  // vraca true ako je polje na kojem je figura kliknuto
-		if(poljeKliknuto(polje) == true) {
-			return true;
-		}
-		return false;
-	}
-	*/

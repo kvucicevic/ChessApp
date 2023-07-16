@@ -22,23 +22,12 @@ public class Lovac extends Figura{
 
         for(int i = 0; i < 8; i++) {
             for(int j = 0; j < 8; j++) {
-                if(zbir == (i+j) || razlika == (j-i))
+                if(zbir == (i+j) || razlika == (j-i)) {
                     potezi.add(new Point(j, i));
+                }
             }
         }
 
-		/*
-		for(int i = 0; i < 8; i++) {
-			for(int j = 0; j < 8; j++) {
-				if(pozicija.y > 0 && pozicija.x > 0) {
-					pozicija.x--;
-					pozicija.y--;
-					potezi.add(new Point(pozicija.x, pozicija.y));
-					System.out.println(pozicija.x + " " + pozicija.y);
-				}
-			}
-		}
-		*/
         return potezi;
     }
 

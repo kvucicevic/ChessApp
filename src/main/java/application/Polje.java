@@ -10,7 +10,6 @@ public class Polje extends StackPane {
 
     private Paint originalnaBoja;
     private Rectangle pozadina;
-
     private Point pozicija;
 
     public Polje(float velicina, int x, int y)
