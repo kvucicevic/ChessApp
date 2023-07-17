@@ -203,15 +203,13 @@ public class Tabla extends GridPane implements Publisher {
 
     private void obojMogucaPolja(Figura f)
     {
-        ///for (Point p : nemogucePreskakanje())
-        ///    getPoljeAt(p.y, p.x).obojiPolje(Color.BLUE);
 
         getPoljeAt(oznacenaFig.pozicija.y, oznacenaFig.pozicija.x).obojiPolje(Color.DARKRED);
         invalidFields = noJump.noJump(f, this);
-        System.out.println(invalidFields);
+        //System.out.println(invalidFields);
         f.getMoguciPotezi().removeAll(invalidFields);
         f.getMogucaPoljaZaJedenje().removeAll(invalidFields);
-        System.out.println(f.getMoguciPotezi());
+        //System.out.println(f.getMoguciPotezi());
 
         for (Point p : f.getMoguciPotezi()) {
             if(invalidFields.contains(p)){
@@ -223,6 +221,70 @@ public class Tabla extends GridPane implements Publisher {
             if(polje.imaFiguru() && polje.getFigura().boja != f.boja) {
                 polje.obojiPolje(Color.BLUE);
             }
+        }
+
+        if(f instanceof Pesak){
+            for(Point p : f.getMogucaPoljaZaJedenje()){
+                Polje polje = getPoljeAt(p.y, p.x);
+                if(polje == null)
+                    continue;
+                if (polje.imaFiguru()) {
+                    if(polje.getFigura().boja != f.boja)
+                        polje.obojiPolje(Color.BLUE);
+                } else {
+                    if(odigraniPotezi.isEmpty())
+                        return;
+                    enPassant((Pesak)f);
+
+                }
+
+            }
+        }
+
+
+        getPoljeAt(oznacenaFig.pozicija.y, oznacenaFig.pozicija.x).obojiPolje(Color.DARKRED);
+
+    }
+
+    public void enPassant(Pesak jede){
+        if(odigraniPotezi.isEmpty())
+            return;
+
+        Polje polj = odigraniPotezi.get(odigraniPotezi.size()-1);
+
+        if(!(polj.getFigura() instanceof Pesak)){
+            return;
+        }
+        Pesak pojeden = (Pesak)polj.getFigura();
+
+        //System.out.println("polja za jedenje: " + jede.getMogucaPoljaZaJedenje().get(0).y + jede.getMogucaPoljaZaJedenje().get(0).x);
+        //System.out.println("polja za jedenje: " + jede.getMogucaPoljaZaJedenje().get(1).y + jede.getMogucaPoljaZaJedenje().get(1).x);
+        /// OVO GORE JE KAKO TREBA
+
+
+        if(pojeden.boja != jede.boja) {
+            if(polj.getPozicija().y == 3 && pojeden.boja == Boja.CRNA) {  /// crni igra sad, a beli je dvostruko stao na 4
+                if(jede.getMogucaPoljaZaJedenje().size() > 1 && jede.pozicija.y == pojeden.pozicija.y){
+                    if(pojeden.pozicija.x == jede.getMogucaPoljaZaJedenje().get(1).x) {
+                        getPoljeAt(jede.getMogucaPoljaZaJedenje().get(1).y, jede.getMogucaPoljaZaJedenje().get(1).x).obojiPolje(Color.BLUE);
+                    } else {
+                        getPoljeAt(jede.getMogucaPoljaZaJedenje().get(0).y, jede.getMogucaPoljaZaJedenje().get(0).x).obojiPolje(Color.BLUE);
+                    }
+                }
+
+            }else if(polj.getPozicija().x == 4 && pojeden.boja == Boja.BELA){
+                if(jede.getMogucaPoljaZaJedenje().size() > 1 && jede.pozicija.y == pojeden.pozicija.y){
+                    if(pojeden.pozicija.x == jede.getMogucaPoljaZaJedenje().get(1).x) {
+                        getPoljeAt(jede.getMogucaPoljaZaJedenje().get(1).y, jede.getMogucaPoljaZaJedenje().get(1).x).obojiPolje(Color.BLUE);
+                    } else {
+                        getPoljeAt(jede.getMogucaPoljaZaJedenje().get(0).y, jede.getMogucaPoljaZaJedenje().get(0).x).obojiPolje(Color.BLUE);
+                    }
+                }
+
+            }
+
+            /// ako je prethodni potez crni pesak na y=3 i pored njega (x+-1) postoji pesak druge boje
+            /// ti pesaci mogu da pojedu na (y-1, x+-1)
         }
 
     }
