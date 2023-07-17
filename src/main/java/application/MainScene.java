@@ -4,13 +4,11 @@ import figure.Figura;
 import javafx.geometry.Insets;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Paint;
-import javafx.scene.shape.Box;
-import javafx.stage.Stage;
+import observer.Subscriber;
 
 public class MainScene extends Scene implements Subscriber {
 
@@ -42,7 +40,6 @@ public class MainScene extends Scene implements Subscriber {
         t.nacrtajTablu();
         t.postaviFigure();
         box.getChildren().add(t);
-        //root.getChildren().add(t);
 
         box.getChildren().add(downBox);
         Insets padding = new Insets(10, 10, 0, 80);

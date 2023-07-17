@@ -8,4 +8,6 @@ module com.example.chessapp {
 
     opens application to javafx.fxml;
     exports application;
+    exports observer;
+    opens observer to javafx.fxml;
 }

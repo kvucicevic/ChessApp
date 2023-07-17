@@ -1,4 +1,6 @@
-package application;
+package observer;
+
+import observer.Subscriber;
 
 public interface Publisher {
 

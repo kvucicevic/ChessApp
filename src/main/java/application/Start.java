@@ -28,12 +28,7 @@ public class Start extends Application {
         stage1.show();
     }
 
-
     public static void main(String[] args) {
         launch(args);
-    }
-
-    public Scene getScene() {
-        return scene;
     }
 }

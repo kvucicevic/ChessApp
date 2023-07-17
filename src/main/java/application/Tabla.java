@@ -5,6 +5,8 @@ import figure.Figura.Boja;
 import javafx.scene.Node;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
+import observer.Publisher;
+import observer.Subscriber;
 
 import java.util.*;
 
@@ -16,7 +18,8 @@ public class Tabla extends GridPane implements Publisher {
     private List<Figura> pojedeneFig = new ArrayList<>();
     private int flag = 0; // flag = 0 - beli je na potezu
     private List<Subscriber> subs = new ArrayList<>();
-
+    private NoJumpImplementation noJump = new NoJumpImplementation();
+    private List<Point> invalidFields = new ArrayList<>();
 
     public Tabla (int velicinaTable)
     {
@@ -70,7 +73,11 @@ public class Tabla extends GridPane implements Publisher {
             }
 
             if(oznacenaFig.getMogucaPoljaZaJedenje().contains(kliknutoPolje.getPozicija())
-                    && (oznacenaFig.boja != f.boja)) { // sacuvaj pojedenu figuru u listu, po zelji
+                    && (oznacenaFig.boja != f.boja)){
+                System.out.println("INVALID FIELDS: " + invalidFields);
+                if(invalidFields.contains(kliknutoPolje.getPozicija())){
+                    return;
+                }
                 if(flag == 2) {
                     oznacenaFig = f;
                     obojMogucaPolja(f);
@@ -130,7 +137,9 @@ public class Tabla extends GridPane implements Publisher {
 
             redosledIgranja();
             if(oznacenaFig.poljeJeMoguce(polje.getPozicija())) { //dodajemo figuru na polje, pomeramo je
-                pomeriOznacenuFig(polje);
+                if(!invalidFields.contains(polje.getPozicija())) {
+                    pomeriOznacenuFig(polje);
+                }
             }
             else {
                 oznacenaFig = null;
@@ -139,26 +148,6 @@ public class Tabla extends GridPane implements Publisher {
         }
     }
 
-
-    /*
-    private ArrayList<Point> nemogucePreskakanje() {
-    	ListIterator<Point> iter = oznacenaFig.getMoguciPotezi().listIterator();
-    	while(iter.hasNext()) {
-    		Point p1 = iter.next();
-    		Polje p2 = getPoljeAt(p1.y, p1.x); //polje koje se nalzai u mogucim poljima figure
-    		if(p2.imaFiguru()) {
-    			iter.remove();
-                System.out.println("iterator: " + iter.toString());
-
-
-    		}
-    		//iter.forEachRemaining(updateMoguciPot :: add);         //ovde ce da brise polje za pesaka
-			//return updateMoguciPot;
-    	}
-    	return oznacenaFig.getMoguciPotezi();
-    }
-
-     */
 
 
     private void pomeriOznacenuFig(Polje polje) {
@@ -218,8 +207,16 @@ public class Tabla extends GridPane implements Publisher {
         ///    getPoljeAt(p.y, p.x).obojiPolje(Color.BLUE);
 
         getPoljeAt(oznacenaFig.pozicija.y, oznacenaFig.pozicija.x).obojiPolje(Color.DARKRED);
+        invalidFields = noJump.noJump(f, this);
+        System.out.println(invalidFields);
+        f.getMoguciPotezi().removeAll(invalidFields);
+        f.getMogucaPoljaZaJedenje().removeAll(invalidFields);
+        System.out.println(f.getMoguciPotezi());
 
         for (Point p : f.getMoguciPotezi()) {
+            if(invalidFields.contains(p)){
+                continue;
+            }
             Polje polje = getPoljeAt(p.y, p.x);
             assert polje != null;
             polje.obojiPolje(Color.SKYBLUE);
@@ -230,7 +227,7 @@ public class Tabla extends GridPane implements Publisher {
 
     }
 
-    private Polje getPoljeAt(int row, int column)
+    public Polje getPoljeAt(int row, int column)
     {
         for (Node node : getChildren())
             if(getRowIndex(node) == row && getColumnIndex(node) == column)
@@ -277,10 +274,6 @@ public class Tabla extends GridPane implements Publisher {
             getPoljeAt(j,i).dodajFiguru(new Pesak(Boja.BELA, i, j));
 
         postaviMouseCallbackZaSvaPolja();
-    }
-
-    public List<Figura> getPojedeneFig() {
-        return pojedeneFig;
     }
 
     @Override
