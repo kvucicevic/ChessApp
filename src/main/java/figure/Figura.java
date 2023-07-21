@@ -43,7 +43,6 @@ public abstract class Figura extends ImageView {
 
     public abstract ArrayList<Point> getMoguciPotezi();
 
-
     public boolean poljeJeMoguce(Point polje)
     {
         return getMoguciPotezi().contains(polje);

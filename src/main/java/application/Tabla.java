@@ -20,6 +20,9 @@ public class Tabla extends GridPane implements Publisher {
     private List<Subscriber> subs = new ArrayList<>();
     private NoJumpImplementation noJump = new NoJumpImplementation();
     private List<Point> invalidFields = new ArrayList<>();
+    private int checkMateFlag = 0;
+    private List<Figura> figure = new ArrayList<>();
+
 
     public Tabla (int velicinaTable)
     {
@@ -100,7 +103,8 @@ public class Tabla extends GridPane implements Publisher {
 
     }
 
-    public void redosledIgranja() {
+    public void redosledIgranja()
+    {
 
         if(odigraniPotezi.isEmpty())
             return;
@@ -123,15 +127,15 @@ public class Tabla extends GridPane implements Publisher {
         }
     }
 
-    private void poljeKliknuto(Polje polje) { //pomeranje figure
+    private void poljeKliknuto(Polje polje)
+    { //pomeranje figure
 
         osveziBojuPolja();
 
         if(polje.imaFiguru()) {
             redosledIgranja();
             kliknutaFigura(polje.getFigura());
-        }
-        else {
+        } else {
             if(oznacenaFig == null)
                 return;
 
@@ -148,9 +152,35 @@ public class Tabla extends GridPane implements Publisher {
         }
     }
 
+    public boolean checkMate(Kralj kralj)
+    {
+        int count = 0;
+
+        for(Point p : kralj.getMoguciPotezi()){
+            Polje polje = getPoljeAt(p.y, p.x);
+            if(polje.imaFiguru()){
+                count++;
+            } else {
+                for(Node node : this.getChildren()){
+                    Polje trenutno = (Polje)node;
+                    if(trenutno.imaFiguru() && trenutno.getFigura().boja != kralj.boja){
+                        if(trenutno.getFigura().getMogucaPoljaZaJedenje().contains(polje.getPozicija()))
+                            count++;
+                    }
+                }
+            }
+        }
+        return count == kralj.getMoguciPotezi().size();
+    }
+
+    public boolean isAttacked()
+    {
+        return false;
+    }
 
 
-    private void pomeriOznacenuFig(Polje polje) {
+    private void pomeriOznacenuFig(Polje polje)
+    {
 
         if((flag == 0 && oznacenaFig.boja != Boja.BELA) || (flag == 1 && oznacenaFig.boja != Boja.CRNA) || flag == 2){
             System.out.println("invalid play queue");
@@ -192,12 +222,14 @@ public class Tabla extends GridPane implements Publisher {
 
     }
 
-    private void pomeriFig(Figura f, Polje p){
+    private void pomeriFig(Figura f, Polje p)
+    {
         getPoljeIspodFigure(f).obrisiFiguru();
         p.dodajFiguru(f);
     }
 
-    private Polje getPoljeIspodFigure(Figura f) {
+    private Polje getPoljeIspodFigure(Figura f)
+    {
         return getPoljeAt(f.pozicija.y, f.pozicija.x);
     }
 
@@ -241,12 +273,12 @@ public class Tabla extends GridPane implements Publisher {
             }
         }
 
-
         getPoljeAt(oznacenaFig.pozicija.y, oznacenaFig.pozicija.x).obojiPolje(Color.DARKRED);
 
     }
 
-    public void enPassant(Pesak jede){
+    public void enPassant(Pesak jede)
+    {
         if(odigraniPotezi.isEmpty())
             return;
 
@@ -299,52 +331,79 @@ public class Tabla extends GridPane implements Publisher {
 
     private void postaviFiguru(int j, int i)
     {
-        if(j == 0 && (i == 0 || i == 7))
-            getPoljeAt(j, i).dodajFiguru(new Top(Boja.CRNA, i, j));
+        if(j == 0 && (i == 0 || i == 7)) {
+            Top t = new Top(Boja.CRNA, i, j);
+            getPoljeAt(j, i).dodajFiguru(t);
+            figure.add(t);
 
-        if(j == 0 && (i == 1 || i == 6))
-            getPoljeAt(j,i).dodajFiguru(new Skakac(Boja.CRNA, i, j));
+        } if(j == 0 && (i == 1 || i == 6)) {
+            Skakac s = new Skakac(Boja.CRNA, i, j);
+            getPoljeAt(j, i).dodajFiguru(s);
+            figure.add(s);
 
-        if(j == 0 && (i == 2 || i == 5))
-            getPoljeAt(j,i).dodajFiguru(new Lovac(Boja.CRNA, i, j));
+        } if(j == 0 && (i == 2 || i == 5)) {
+            Lovac l = new Lovac(Boja.CRNA, i, j);
+            getPoljeAt(j, i).dodajFiguru(l);
+            figure.add(l);
 
-        if(j == 0 && i == 3)
-            getPoljeAt(j,i).dodajFiguru(new Dama(Boja.CRNA, i, j));
+        } if(j == 0 && i == 3) {
+            Dama d = new Dama(Boja.CRNA, i, j);
+            getPoljeAt(j,i).dodajFiguru(d);
+            figure.add(d);
 
-        if(j == 0 && i == 4)
-            getPoljeAt(j,i).dodajFiguru(new Kralj(Boja.CRNA, i, j));
+        } if(j == 0 && i == 4) {
+            Kralj k = new Kralj(Boja.CRNA, i, j);
+            getPoljeAt(j,i).dodajFiguru(k);
+            figure.add(k);
 
-        if(j == 7 && (i == 0 || i == 7))
-            getPoljeAt(j,i).dodajFiguru(new Top(Boja.BELA, i, j));
+        } if(j == 7 && (i == 0 || i == 7)) {
+            Top t = new Top(Boja.BELA, i, j);
+            getPoljeAt(j, i).dodajFiguru(t);
+            figure.add(t);
 
-        if(j == 7 && (i == 1 || i == 6))
-            getPoljeAt(j,i).dodajFiguru(new Skakac(Boja.BELA, i, j));
+        } if(j == 7 && (i == 1 || i == 6)) {
+            Skakac s = new Skakac(Boja.BELA, i, j);
+            getPoljeAt(j, i).dodajFiguru(s);
+            figure.add(s);
 
-        if(j == 7 && (i == 2 || i == 5))
-            getPoljeAt(j,i).dodajFiguru(new Lovac(Boja.BELA, i, j));
+        } if(j == 7 && (i == 2 || i == 5)) {
+            Lovac l = new Lovac(Boja.BELA, i, j);
+            getPoljeAt(j, i).dodajFiguru(l);
+            figure.add(l);
 
-        if(j == 7 && i == 3)
-            getPoljeAt(j,i).dodajFiguru(new Dama(Boja.BELA, i, j));
+        } if(j == 7 && i == 3) {
+            Dama d = new Dama(Boja.BELA, i, j);
+            getPoljeAt(j,i).dodajFiguru(d);
+            figure.add(d);
 
-        if(j == 7 && i == 4)
-            getPoljeAt(j,i).dodajFiguru(new Kralj(Boja.BELA, i, j));
+        } if(j == 7 && i == 4) {
+            Kralj k = new Kralj(Boja.BELA, i, j);
+            getPoljeAt(j,i).dodajFiguru(k);
+            figure.add(k);
 
-        if(j == 1)
-            getPoljeAt(j,i).dodajFiguru(new Pesak(Boja.CRNA, i, j));
+        } if(j == 1) {
+            Pesak p = new Pesak(Boja.CRNA, i, j);
+            getPoljeAt(j,i).dodajFiguru(p);
+            figure.add(p);
 
-        if(j == 6)
-            getPoljeAt(j,i).dodajFiguru(new Pesak(Boja.BELA, i, j));
+        } if(j == 6){
+            Pesak p = new Pesak(Boja.BELA, i, j);
+            getPoljeAt(j,i).dodajFiguru(p);
+            figure.add(p);
+        }
 
         postaviMouseCallbackZaSvaPolja();
     }
 
     @Override
-    public void addSub(Subscriber sub) {
+    public void addSub(Subscriber sub)
+    {
         subs.add(sub);
     }
 
     @Override
-    public void notifySubs(Object notification) {
+    public void notifySubs(Object notification)
+    {
         for(Subscriber s : subs){
             s.update(notification);
         }

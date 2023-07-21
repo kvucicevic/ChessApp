@@ -9,7 +9,6 @@ import java.util.ArrayList;
 
 public class NoJumpImplementation implements NoJump{
 
-
     @Override
     public ArrayList<Point> noJump(Figura oznacenaFig, Tabla t) {
 
@@ -50,7 +49,7 @@ public class NoJumpImplementation implements NoJump{
                             }
                         }
 
-                    } else {
+                    } else if (p.x > oznacenaFig.pozicija.x && p.y == oznacenaFig.pozicija.y){
                         for (Point p1 : oznacenaFig.getMoguciPotezi()) {
                             if (p1.x > p.x && p1.y == p.y) {
                                 if (!p1.equals(polje.getPozicija())){
@@ -170,7 +169,7 @@ public class NoJumpImplementation implements NoJump{
                             }
                         }
 
-                    } else {
+                    } else if (p.x > oznacenaFig.pozicija.x && p.y == oznacenaFig.pozicija.y){
                         for (Point p1 : oznacenaFig.getMoguciPotezi()) {
                             if (p1.x > p.x && p1.y == p.y) {
                                 if (!p1.equals(polje.getPozicija())){
