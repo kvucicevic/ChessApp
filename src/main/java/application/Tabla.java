@@ -66,6 +66,10 @@ public class Tabla extends GridPane implements Publisher {
 
     private void kliknutaFigura(Figura f)
     {
+
+        if(isCheckMate())
+            return;
+
         //logika za jedenje - drugi klik
         if(oznacenaFig != null) {
             Polje kliknutoPolje = getPoljeIspodFigure(f);
@@ -77,10 +81,13 @@ public class Tabla extends GridPane implements Publisher {
 
             if(oznacenaFig.getMogucaPoljaZaJedenje().contains(kliknutoPolje.getPozicija())
                     && (oznacenaFig.boja != f.boja)){
-                System.out.println("INVALID FIELDS: " + invalidFields);
+                //System.out.println("INVALID FIELDS: " + invalidFields);
                 if(invalidFields.contains(kliknutoPolje.getPozicija())){
                     return;
                 }
+                if(f instanceof Kralj)
+                    return;
+
                 if(flag == 2) {
                     oznacenaFig = f;
                     obojMogucaPolja(f);
@@ -88,6 +95,7 @@ public class Tabla extends GridPane implements Publisher {
                 }
                 Figura fig = kliknutoPolje.getFigura();
                 pojedeneFig.add(fig);
+                figure.remove(fig);
                 //System.out.println(pojedeneFig);
                 notifySubs(fig);
                 kliknutoPolje.obrisiFiguru();
@@ -96,6 +104,9 @@ public class Tabla extends GridPane implements Publisher {
 
             }
         }
+
+        if(isCheckMate())
+            return;
 
         //selektuj figuru - prvi klik
         oznacenaFig = f;
@@ -112,6 +123,9 @@ public class Tabla extends GridPane implements Publisher {
         if(oznacenaFig == null){
             return;
         }
+
+        if(checkMateFlag == 1)
+            return;
 
         if(odigraniPotezi.get(odigraniPotezi.size()-1).getFigura().boja == Boja.CRNA
                 && oznacenaFig.boja == Boja.BELA) {
@@ -131,6 +145,11 @@ public class Tabla extends GridPane implements Publisher {
     { //pomeranje figure
 
         osveziBojuPolja();
+
+        if(checkMateFlag == 1) {
+            System.out.println("CHECKMATE");
+            return;
+        }
 
         if(polje.imaFiguru()) {
             redosledIgranja();
@@ -152,32 +171,80 @@ public class Tabla extends GridPane implements Publisher {
         }
     }
 
-    public boolean checkMate(Kralj kralj)
+    /// uslovi kad je kralj matiran
+    public boolean kingMated(Kralj kralj)
     {
-        int count = 0;
+        if(!isKingAttacked(kralj))
+            return false;
 
+        int count = 0;
+        System.out.println("MOGUCA POLJA ZA KRALJA: " + kralj.getMoguciPotezi());
         for(Point p : kralj.getMoguciPotezi()){
             Polje polje = getPoljeAt(p.y, p.x);
             if(polje.imaFiguru()){
                 count++;
             } else {
-                for(Node node : this.getChildren()){
-                    Polje trenutno = (Polje)node;
-                    if(trenutno.imaFiguru() && trenutno.getFigura().boja != kralj.boja){
-                        if(trenutno.getFigura().getMogucaPoljaZaJedenje().contains(polje.getPozicija()))
-                            count++;
+                if(kralj.boja == Boja.BELA) {
+                    if (isAttackedField(polje, Boja.CRNA)) {
+                        count++;
+                    }
+                } else {
+                    if (isAttackedField(polje, Boja.BELA)) {
+                        count++;
+                    }
+                }
+
+            }
+        }
+        System.out.println("count is: " + count);
+        System.out.println("size is: " + kralj.getMoguciPotezi().size());
+        return count == kralj.getMoguciPotezi().size();
+    }
+
+    /// provera da li je doslo do mata
+    public boolean isCheckMate()
+    {
+        if(odigraniPotezi.size() > 3) {
+            for(Figura fig : figure) {
+                if (fig instanceof Kralj) {
+                    if (kingMated((Kralj) fig)) {
+                        checkMateFlag = 1;
+                        System.out.println("CHECKMATE");
+                        return true;
                     }
                 }
             }
         }
-        return count == kralj.getMoguciPotezi().size();
-    }
-
-    public boolean isAttacked()
-    {
         return false;
     }
 
+    public boolean isKingAttacked(Kralj kralj)
+    {
+        for(Figura attacker : figure){
+            if(attacker.boja != kralj.boja && attacker.getMogucaPoljaZaJedenje().contains(getPoljeIspodFigure(kralj).getPozicija())) {
+                    System.out.println("KRALJ JE NAPADNUT!!");
+                    return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean isAttackedField(Polje polje, Boja bojaNapadaca)
+    {
+        if(polje.imaFiguru()) {
+            return true;
+        } else {
+            for(Figura fig : figure){
+                if(fig.boja != bojaNapadaca)
+                    continue;
+                if(fig.getMogucaPoljaZaJedenje().contains(polje.getPozicija()) ||
+                            fig.getMoguciPotezi().contains(polje.getPozicija())) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 
     private void pomeriOznacenuFig(Polje polje)
     {
@@ -235,6 +302,11 @@ public class Tabla extends GridPane implements Publisher {
 
     private void obojMogucaPolja(Figura f)
     {
+
+        if(checkMateFlag == 1) {
+            System.out.println("CHECKMATE");
+            return;
+        }
 
         getPoljeAt(oznacenaFig.pozicija.y, oznacenaFig.pozicija.x).obojiPolje(Color.DARKRED);
         invalidFields = noJump.noJump(f, this);
