@@ -14,13 +14,13 @@ public class Tabla extends GridPane implements Publisher {
 
     public Figura oznacenaFig;
     private final int velicinaPolja;
+    private int flag = 0; // flag = 0 - beli je na potezu
+    private int checkMateFlag = 0;
+    private NoJumpImplementation noJump = new NoJumpImplementation();
     private List<Polje> odigraniPotezi = new ArrayList<>();
     private List<Figura> pojedeneFig = new ArrayList<>();
-    private int flag = 0; // flag = 0 - beli je na potezu
     private List<Subscriber> subs = new ArrayList<>();
-    private NoJumpImplementation noJump = new NoJumpImplementation();
     private List<Point> invalidFields = new ArrayList<>();
-    private int checkMateFlag = 0;
     private List<Figura> figure = new ArrayList<>();
 
 
@@ -79,7 +79,7 @@ public class Tabla extends GridPane implements Publisher {
                 return;
             }
 
-            if(oznacenaFig.getMogucaPoljaZaJedenje().contains(kliknutoPolje.getPozicija())
+            if(removeFileds(oznacenaFig, oznacenaFig.getMogucaPoljaZaJedenje()).contains(kliknutoPolje.getPozicija())
                     && (oznacenaFig.boja != f.boja)){
                 //System.out.println("INVALID FIELDS: " + invalidFields);
                 if(invalidFields.contains(kliknutoPolje.getPozicija())){
@@ -96,7 +96,6 @@ public class Tabla extends GridPane implements Publisher {
                 Figura fig = kliknutoPolje.getFigura();
                 pojedeneFig.add(fig);
                 figure.remove(fig);
-                //System.out.println(pojedeneFig);
                 notifySubs(fig);
                 kliknutoPolje.obrisiFiguru();
                 pomeriOznacenuFig(kliknutoPolje);
@@ -178,9 +177,8 @@ public class Tabla extends GridPane implements Publisher {
             return false;
 
         int count = 0;
-        System.out.println("MOGUCA POLJA ZA KRALJA: " + kralj.getMoguciPotezi());
 
-        for(Point p : kralj.getMoguciPotezi()){
+        for(Point p : removeFileds(kralj, kralj.getMoguciPotezi())){
             Polje polje = getPoljeAt(p.y, p.x);
             if(polje.imaFiguru()){
                 if(polje.getFigura().boja == kralj.boja) {
@@ -204,8 +202,8 @@ public class Tabla extends GridPane implements Publisher {
             }
         }
         System.out.println("count is: " + count);
-        System.out.println("size is: " + kralj.getMoguciPotezi().size());
-        return count == kralj.getMoguciPotezi().size();
+        System.out.println("size is: " + removeFileds(kralj, kralj.getMoguciPotezi()).size());
+        return count == removeFileds(kralj, kralj.getMoguciPotezi()).size();
     }
 
     /// provera da li je doslo do mata
@@ -227,9 +225,11 @@ public class Tabla extends GridPane implements Publisher {
 
     public boolean isKingAttacked(Kralj kralj)
     {
+
         for(Figura attacker : figure){
-            if(attacker.boja != kralj.boja && attacker.getMogucaPoljaZaJedenje().contains(getPoljeIspodFigure(kralj).getPozicija())) {
-                    System.out.println("KRALJ JE NAPADNUT!!");
+            ArrayList<Point> remove = removeFileds(attacker, attacker.getMoguciPotezi());
+            if(attacker.boja != kralj.boja &&
+                    remove.contains(getPoljeIspodFigure(kralj).getPozicija())) {
                     return true;
             }
         }
@@ -244,8 +244,8 @@ public class Tabla extends GridPane implements Publisher {
             for(Figura fig : figure){
                 if(fig.boja != bojaNapadaca)
                     continue;
-                if(fig.getMogucaPoljaZaJedenje().contains(polje.getPozicija()) ||
-                            fig.getMoguciPotezi().contains(polje.getPozicija())) {
+                if(removeFileds(fig, fig.getMogucaPoljaZaJedenje()).contains(polje.getPozicija()) ||
+                            removeFileds(fig, fig.getMoguciPotezi()).contains(polje.getPozicija())) {
                     return true;
                 }
             }
@@ -256,7 +256,7 @@ public class Tabla extends GridPane implements Publisher {
     public boolean figuraBranjena(Figura fig){
         for(Figura defender : figure){
             if(defender.boja == fig.boja){
-                if(defender.getMogucaPoljaZaJedenje().contains(fig.pozicija)){
+                if(removeFileds(defender, defender.getMogucaPoljaZaJedenje()).contains(fig.pozicija)){
                     return true;
                 }
             }
@@ -327,16 +327,9 @@ public class Tabla extends GridPane implements Publisher {
         }
 
         getPoljeAt(oznacenaFig.pozicija.y, oznacenaFig.pozicija.x).obojiPolje(Color.DARKRED);
-        invalidFields = noJump.noJump(f, this);
-        //System.out.println(invalidFields);
-        f.getMoguciPotezi().removeAll(invalidFields);
-        f.getMogucaPoljaZaJedenje().removeAll(invalidFields);
-        //System.out.println(f.getMoguciPotezi());
+        //invalidFields = noJump.noJump(f, this);
 
-        for (Point p : f.getMoguciPotezi()) {
-            if(invalidFields.contains(p)){
-                continue;
-            }
+        for (Point p : removeFileds(f, f.getMoguciPotezi())) {
             Polje polje = getPoljeAt(p.y, p.x);
             assert polje != null;
             polje.obojiPolje(Color.SKYBLUE);
@@ -364,6 +357,22 @@ public class Tabla extends GridPane implements Publisher {
         }
 
         getPoljeAt(oznacenaFig.pozicija.y, oznacenaFig.pozicija.x).obojiPolje(Color.DARKRED);
+
+    }
+
+    public ArrayList<Point> removeFileds(Figura f, ArrayList<Point> list)
+    {
+        invalidFields = noJump.noJump(f, this);
+
+        ArrayList<Point> cpy = new ArrayList<>(list);
+        Iterator<Point> iterator = cpy.iterator();
+        while (iterator.hasNext()) {
+            Point p = iterator.next();
+            if (invalidFields.contains(p)) {
+                iterator.remove();
+            }
+        }
+        return cpy;
 
     }
 
