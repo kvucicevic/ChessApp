@@ -179,10 +179,17 @@ public class Tabla extends GridPane implements Publisher {
 
         int count = 0;
         System.out.println("MOGUCA POLJA ZA KRALJA: " + kralj.getMoguciPotezi());
+
         for(Point p : kralj.getMoguciPotezi()){
             Polje polje = getPoljeAt(p.y, p.x);
             if(polje.imaFiguru()){
-                count++;
+                if(polje.getFigura().boja == kralj.boja) {
+                    count++;
+                } else {
+                    if(!figuraBranjena(polje.getFigura())){
+                        count++;
+                    }
+                }
             } else {
                 if(kralj.boja == Boja.BELA) {
                     if (isAttackedField(polje, Boja.CRNA)) {
@@ -239,6 +246,17 @@ public class Tabla extends GridPane implements Publisher {
                     continue;
                 if(fig.getMogucaPoljaZaJedenje().contains(polje.getPozicija()) ||
                             fig.getMoguciPotezi().contains(polje.getPozicija())) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public boolean figuraBranjena(Figura fig){
+        for(Figura defender : figure){
+            if(defender.boja == fig.boja){
+                if(defender.getMogucaPoljaZaJedenje().contains(fig.pozicija)){
                     return true;
                 }
             }
