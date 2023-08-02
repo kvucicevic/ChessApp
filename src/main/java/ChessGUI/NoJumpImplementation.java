@@ -1,4 +1,4 @@
-package application;
+package ChessGUI;
 
 import figure.Dama;
 import figure.Figura;

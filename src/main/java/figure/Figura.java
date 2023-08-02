@@ -1,6 +1,6 @@
 package figure;
 
-import application.Point;
+import ChessGUI.Point;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
@@ -38,7 +38,7 @@ public abstract class Figura extends ImageView {
         String str = "/" + bojastr + imgName + ".png";
 
         return new Image(Objects.requireNonNull(Figura.class.getResourceAsStream(str)), 70, 70, true, true);
-        // /crniTop.jpg
+        // /crniTop.png
     }
 
     public abstract ArrayList<Point> getMoguciPotezi();

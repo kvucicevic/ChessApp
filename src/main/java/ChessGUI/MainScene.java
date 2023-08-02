@@ -1,4 +1,4 @@
-package application;
+package ChessGUI;
 
 import figure.Figura;
 import javafx.geometry.Insets;

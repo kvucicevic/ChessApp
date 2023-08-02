@@ -6,8 +6,10 @@ module com.example.chessapp {
     requires org.kordamp.bootstrapfx.core;
     requires com.almasb.fxgl.all;
 
-    opens application to javafx.fxml;
-    exports application;
+    opens ChessGUI to javafx.fxml;
+    exports ChessGUI;
     exports observer;
     opens observer to javafx.fxml;
+    exports start;
+    opens start to javafx.fxml;
 }

@@ -1,7 +1,8 @@
-package application;
+package start;
 
+import ChessGUI.MainScene;
+import gameGUI.EraPickScene;
 import javafx.application.Application;
-import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.layout.GridPane;
@@ -11,16 +12,18 @@ import javafx.stage.Stage;
 
 public class Start extends Application {
 
+    private static Stage stage1;
     private Scene scene;
     @Override
     public void start(Stage stage){
-        Stage stage1 = new Stage();
+        stage1 = new Stage();
 
         Image icon = new Image(String.valueOf(getClass().getResource("/tablaSah.png")));
         stage1.getIcons().add(icon);
 
         GridPane root = new GridPane();
-        scene = new MainScene(root, 720, 720, Color.BROWN);
+        scene = new EraPickScene(root, 720, 720, Color.BROWN);
+        //scene = new MainScene(root, 720, 720, Color.BROWN);
 
         stage1.setScene(scene);
         stage1.setTitle("SAH");
@@ -30,5 +33,9 @@ public class Start extends Application {
 
     public static void main(String[] args) {
         launch(args);
+    }
+
+    public static Stage getStage1() {
+        return stage1;
     }
 }

@@ -1,4 +1,4 @@
-package application;
+package ChessGUI;
 
 import figure.*;
 import figure.Figura.Boja;
@@ -16,6 +16,7 @@ public class Tabla extends GridPane implements Publisher {
     private final int velicinaPolja;
     private int flag = 0; // flag = 0 - beli je na potezu
     private int checkMateFlag = 0;
+    private int checkFlag = 0;
     private NoJumpImplementation noJump = new NoJumpImplementation();
     private List<Polje> odigraniPotezi = new ArrayList<>();
     private List<Figura> pojedeneFig = new ArrayList<>();
@@ -70,6 +71,7 @@ public class Tabla extends GridPane implements Publisher {
         if(isCheckMate())
             return;
 
+
         //logika za jedenje - drugi klik
         if(oznacenaFig != null) {
             Polje kliknutoPolje = getPoljeIspodFigure(f);
@@ -82,18 +84,23 @@ public class Tabla extends GridPane implements Publisher {
             if(removeFileds(oznacenaFig, oznacenaFig.getMogucaPoljaZaJedenje()).contains(kliknutoPolje.getPozicija())
                     && (oznacenaFig.boja != f.boja)){
                 //System.out.println("INVALID FIELDS: " + invalidFields);
-                if(invalidFields.contains(kliknutoPolje.getPozicija())){
+                if(invalidFields.contains(kliknutoPolje.getPozicija())){  // msm da mi ovo vise ne treba
                     return;
                 }
-                if(f instanceof Kralj)
-                    return;
 
-                if(flag == 2) {
+                if(flag == 2 || f instanceof Kralj) {
                     oznacenaFig = f;
                     obojMogucaPolja(f);
                     return;
                 }
-                Figura fig = kliknutoPolje.getFigura();
+
+                if(isCheck()){
+                    if(f instanceof Kralj){
+
+                    }
+                }
+
+                Figura fig = kliknutoPolje.getFigura();  // fig je pojedena figura
                 pojedeneFig.add(fig);
                 figure.remove(fig);
                 notifySubs(fig);
@@ -171,9 +178,9 @@ public class Tabla extends GridPane implements Publisher {
     }
 
     /// uslovi kad je kralj matiran
-    public boolean kingMated(Kralj kralj)
+    private boolean kingMated(Kralj kralj)
     {
-        if(!isKingAttacked(kralj))
+        if(!isFigAttacked(kralj))
             return false;
 
         int count = 0;
@@ -223,13 +230,42 @@ public class Tabla extends GridPane implements Publisher {
         return false;
     }
 
-    public boolean isKingAttacked(Kralj kralj)
+    public boolean isCheck()
     {
+        for(Figura kralj : figure){
+            if(kralj instanceof Kralj && isFigAttacked(kralj)){
+                checkFlag = 1;
+                return true;
+            }
+        }
+        checkFlag = 0;
+        return false;
+    }
 
+    public ArrayList<Point> moguciPoteziSah(Figura attacker){
+
+        ArrayList<Point> moguci = new ArrayList<>();
+
+        for(Point attackerPos : removeFileds(attacker, attacker.getMoguciPotezi())){
+            for(Figura defender : figure){
+                if(defender.boja == attacker.boja)
+                    continue;
+
+                if(defender.getMoguciPotezi().contains(attackerPos)){
+                    moguci.add(attackerPos);
+                }
+
+            }
+        }
+
+        return moguci;
+    }
+    public boolean isFigAttacked(Figura fig)
+    {
         for(Figura attacker : figure){
             ArrayList<Point> remove = removeFileds(attacker, attacker.getMoguciPotezi());
-            if(attacker.boja != kralj.boja &&
-                    remove.contains(getPoljeIspodFigure(kralj).getPozicija())) {
+            if(attacker.boja != fig.boja &&
+                    remove.contains(getPoljeIspodFigure(fig).getPozicija())) {
                     return true;
             }
         }
@@ -253,7 +289,8 @@ public class Tabla extends GridPane implements Publisher {
         return false;
     }
 
-    public boolean figuraBranjena(Figura fig){
+    public boolean figuraBranjena(Figura fig)
+    {
         for(Figura defender : figure){
             if(defender.boja == fig.boja){
                 if(removeFileds(defender, defender.getMogucaPoljaZaJedenje()).contains(fig.pozicija)){

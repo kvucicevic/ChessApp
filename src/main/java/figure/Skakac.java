@@ -1,6 +1,6 @@
 package figure;
 
-import application.Point;
+import ChessGUI.Point;
 
 import java.util.ArrayList;
 
