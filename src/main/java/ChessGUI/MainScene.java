@@ -6,6 +6,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Paint;
 import observer.Subscriber;
@@ -13,14 +14,14 @@ import observer.Subscriber;
 public class MainScene extends Scene implements Subscriber {
 
     private Tabla t;
-    protected GridPane root;
+    protected StackPane root;
     protected VBox box;
     private HBox uppBox;
     private HBox downBox;
 
-    public MainScene(Parent parent, double v, double v1, Paint paint) {
-        super(parent, v, v1, paint);
-        this.root = (GridPane) parent;
+    public MainScene(Parent parent, double v, double v1) {
+        super(parent, v, v1);
+        this.root = (StackPane) parent;
         box = new VBox();
         root.getChildren().add(box);
         init();

@@ -1,14 +1,12 @@
 package gameGUI;
 
-import ChessGUI.MainScene;
+import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.image.ImageView;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.image.Image;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
 import start.Start;
 
 public class EraPickScene extends Scene {
@@ -18,14 +16,20 @@ public class EraPickScene extends Scene {
     private Button middle;
     private Button newEra;
     private Button modern;
-    private GridPane root;
+    private StackPane root;
 
-    public EraPickScene(Parent parent, double v, double v1, Paint paint) {
-        super(parent, v, v1, paint);
+    public EraPickScene(Parent parent, double v, double v1) {
+        super(parent, v, v1);
         init();
         actionSet();
-        this.root = (GridPane) parent;
+        this.root = (StackPane) parent;
         root.getChildren().add(box);
+
+        BackgroundImage myBI= new BackgroundImage(new Image("/background.jpg",300,300,false,true),
+                BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER,
+                BackgroundSize.DEFAULT);
+
+        root.setBackground(new Background(myBI));
     }
 
     private void init(){
@@ -35,6 +39,7 @@ public class EraPickScene extends Scene {
         modern = new Button("MODERN AGE");
         box = new VBox();
         box.getChildren().addAll(old, middle, newEra, modern);
+        box.setAlignment(Pos.CENTER);
     }
 
     private void actionSet(){

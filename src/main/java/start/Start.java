@@ -5,7 +5,7 @@ import gameGUI.EraPickScene;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
-import javafx.scene.layout.GridPane;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
@@ -21,9 +21,19 @@ public class Start extends Application {
         Image icon = new Image(String.valueOf(getClass().getResource("/tablaSah.png")));
         stage1.getIcons().add(icon);
 
-        GridPane root = new GridPane();
-        scene = new EraPickScene(root, 720, 720, Color.BROWN);
+        StackPane root = new StackPane();
+        scene = new EraPickScene(root, 300, 300);
+        //root.setId("pane");
+        //scene.getStylesheets().addAll(this.getClass().getResource("/background.css").toExternalForm()); /// NOT WORKING IDK WHY
         //scene = new MainScene(root, 720, 720, Color.BROWN);
+        /* css file
+            .root {
+                -fx-background-image: url("/backgrounds/background.jpg");
+                -fx-background-repeat: stretch;
+                -fx-background-size: 300 300;
+                -fx-background-position: center center;
+            }
+         */
 
         stage1.setScene(scene);
         stage1.setTitle("SAH");
