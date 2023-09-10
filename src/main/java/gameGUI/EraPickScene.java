@@ -44,7 +44,7 @@ public class EraPickScene extends Scene {
 
     private void actionSet(){
         modern.setOnAction(e -> {
-            Start.getStage1().setScene(new modernCourtyPickScene(new GridPane(), 700, 400, Color.BROWN));
+            Start.getStage1().setScene(new ModernCountryPickScene(new GridPane(), 700, 400, Color.BROWN));
             Start.getStage1().show();
         });
     }

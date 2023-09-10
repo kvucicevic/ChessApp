@@ -1,12 +1,11 @@
 package start;
 
-import ChessGUI.MainScene;
 import gameGUI.EraPickScene;
+import gameGUI.GameMainScene;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 
@@ -22,12 +21,13 @@ public class Start extends Application {
         stage1.getIcons().add(icon);
 
         StackPane root = new StackPane();
-        scene = new EraPickScene(root, 300, 300);
+        //scene = new EraPickScene(root, 300, 300);
+        scene = new GameMainScene(root, 800, 600);
         //root.setId("pane");
         //scene.getStylesheets().addAll(this.getClass().getResource("/background.css").toExternalForm()); /// NOT WORKING IDK WHY
         //scene = new MainScene(root, 720, 720, Color.BROWN);
         /* css file
-            .root {
+            .root { tried with #pane
                 -fx-background-image: url("/backgrounds/background.jpg");
                 -fx-background-repeat: stretch;
                 -fx-background-size: 300 300;

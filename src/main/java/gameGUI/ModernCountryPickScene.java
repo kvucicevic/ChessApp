@@ -1,6 +1,7 @@
 package gameGUI;
 
-import ChessGUI.MainScene;
+import countries.Country;
+import countries.Germany;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -11,12 +12,12 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import start.Start;
 
-public class modernCourtyPickScene extends Scene {
+public class ModernCountryPickScene extends Scene {
 
+    private Country country;
     private GridPane root;
     private HBox box;
     private Button germany;
@@ -40,7 +41,7 @@ public class modernCourtyPickScene extends Scene {
     private VBox russiaBox;
 
 
-    public modernCourtyPickScene(Parent parent, double v, double v1, Paint paint) {
+    public ModernCountryPickScene(Parent parent, double v, double v1, Paint paint) {
         super(parent, v, v1, paint);
         init();
         actionSet();
@@ -86,6 +87,7 @@ public class modernCourtyPickScene extends Scene {
 
     private void actionSet(){
         germany.setOnAction(e -> {
+            country = new Germany();
             Start.getStage1().setScene(new MapScene(new StackPane(), 720, 720));
             Start.getStage1().centerOnScreen();
             Start.getStage1().show();
